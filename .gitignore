@@ -52,3 +52,5 @@ Mkfile.old
 dkms.conf
 
 ian_proj1
+.vscode
+.idea
