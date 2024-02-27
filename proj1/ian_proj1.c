@@ -1,3 +1,9 @@
+/**
+ * @file ian_proj1.c
+ * @brief Prints ELF symbol table.
+ * @author Marek Gergel (xgerge01)
+ */
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -11,17 +17,11 @@
  * @param elf ELF file
  */
 void print_symbols(Elf *elf) {
-    GElf_Ehdr ehdr;
     GElf_Shdr shdr;
     Elf_Scn *scn = NULL;
     Elf_Data *data;
     Elf32_Sym *sym32;
     Elf64_Sym *sym64;
-
-    // Get the ELF header
-    if (gelf_getehdr(elf, &ehdr) == NULL) {
-        errx(elf_errno(), "gelf_getehdr() failed: %s\n", elf_errmsg(-1));
-    }
 
     // Search all sections
     while ((scn = elf_nextscn(elf, scn)) != NULL) {
@@ -89,6 +89,12 @@ void print_symbols(Elf *elf) {
     }
 }
 
+/**
+ * @brief Main function.
+ * @param argc Number of arguments
+ * @param argv Arguments
+ * @return 0 if success, anything else if error
+ */
 int main(int argc, char *argv[]) {
 
     if (argc != 2) {
