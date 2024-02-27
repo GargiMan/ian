@@ -1,6 +1,8 @@
 #include <stdio.h>
+char z = 5;
 int a = 10;
-int b = 42;
+static int b __attribute__((section(".my_data_section"))) = 42;
+char y;
 int x;
 int main() {
     int c = a + b;
