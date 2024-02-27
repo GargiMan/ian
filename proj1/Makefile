@@ -1,7 +1,7 @@
 # Makefile IAN Project 1
 # Marek Gergel (xgerge01)
 
-PROG_NAME := ian_proj1
+PROG_NAME := ian-proj1
 CC := gcc
 CCFLAGS := -std=c99 -Wall -Wextra -pedantic
 TESTDATA := $(wildcard testData/*.c)
