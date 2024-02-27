@@ -14,11 +14,12 @@ all: $(PROG_NAME)
 $(PROG_NAME): $(SRC_FILES)
 	$(CC) $(CCFLAGS) $(SRC_FILES) -o $@ -lelf
 
-test-compile:
-	@for test in $(TESTDATA:%.c=%); do $(CC) $(CCFLAGS) -c $$test.c -o $$test.o; done
+test-compile: $(TESTDATA)
+	@for test in $(TESTDATA:%.c=%); do $(CC) $(CCFLAGS) -c $$test".c" -o $$test".o"; done
+	@for test in $(TESTDATA:%.c=%); do $(CC) $(CCFLAGS) -m32 -c $$test".c" -o $$test"32.o"; done
 
 test: all test-compile
-	@for test in $(TESTDATA:%.c=%); do ./$(PROG_NAME) $$test.o >$$test.out; if diff -q $$test.out $$test.ref >/dev/null; then echo "Test OK : $$test"; else echo "Test FAIL : $$test"; fi done
+	@for test in $(TESTDATA:%.c=%); do ./$(PROG_NAME) $$test".o" >$$test".out"; if diff -q $$test".out" $$test".ref" >/dev/null; then echo "Test OK : $$test"; else echo "Test FAIL : $$test"; fi; ./$(PROG_NAME) $$test"32.o" >$$test".out"; if diff -q $$test".out" $$test".ref" >/dev/null; then echo "Test OK : $$test (32-bit)"; else echo "Test FAIL : $$test (32-bit)"; fi done
 
 clean:
 	rm -rf $(PROG_NAME) $(PROG_NAME).zip $(PROG_NAME).tar
@@ -28,4 +29,4 @@ zip:
 	zip -r $(PROG_NAME).zip *.h *.c Makefile
 
 tar:
-	tar -cf $(PROG_NAME).tar.gz *.h *.c Makefile
+	tar -czf $(PROG_NAME).tar.gz *.h *.c Makefile
