@@ -6,7 +6,7 @@ CC := gcc
 CCFLAGS := -std=c99 -Wall -Wextra -pedantic
 TESTDATA := $(wildcard testData/*.c)
 
-.PHONY: all $(PROG_NAME) test clean zip tar
+.PHONY: all $(PROG_NAME) test test-compile clean zip tar
 
 all: $(PROG_NAME)
 

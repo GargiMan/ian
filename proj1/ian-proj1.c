@@ -20,70 +20,38 @@ void print_symbols(Elf *elf) {
     GElf_Shdr shdr;
     Elf_Scn *scn = NULL;
     Elf_Data *data;
-    Elf32_Sym *sym32;
-    Elf64_Sym *sym64;
+    GElf_Sym sym;
 
     // Search all sections
-    while ((scn = elf_nextscn(elf, scn)) != NULL) {
-        if (gelf_getshdr(scn, &shdr) != &shdr)
-            continue;
+    while ((scn = elf_nextscn(elf, scn))) {
 
-        // Check if section contains symbol table
+        if (gelf_getshdr(scn, &shdr) != &shdr) continue;
+
+        // Check if section contains symbols
         if (shdr.sh_type == SHT_SYMTAB || shdr.sh_type == SHT_DYNSYM) {
 
-            data = elf_getdata(scn, NULL);
+            if (!(data = elf_getdata(scn, NULL))) continue;
+            
             int symbols = shdr.sh_size / shdr.sh_entsize;
 
-            if (data) {
+            // Print the symbol table
+            printf("%-20s %s\n", "Name", "Value");
 
-                // Determine if symbols are 32 or 64 bit
-                if (shdr.sh_entsize == sizeof(Elf32_Sym)) {
-                    sym32 = (Elf32_Sym *) data->d_buf;
-                    sym64 = NULL;
-                } else {
-                    sym32 = NULL;
-                    sym64 = (Elf64_Sym *) data->d_buf;
-                }
+            for (int i = 0; i < symbols; ++i) {
 
-                // Print the symbol table
-                printf("%-20s %s\n", "Name", "Value");
-                for (int i = 0; i < symbols; ++i) {
-                    if (sym32) {
-                        if (sym32[i].st_shndx == SHN_UNDEF || sym32[i].st_shndx == SHN_COMMON ||
-                            sym32[i].st_shndx == SHN_ABS) {
-                            continue;
-                        }
-                        Elf_Scn *data_scn = elf_getscn(elf, sym32[i].st_shndx);
-                        if (data_scn != NULL) {
-                            Elf_Data *data_data = elf_getdata(data_scn, NULL);
-                            if (data_data != NULL) {
-                                if (GELF_ST_TYPE(sym32[i].st_info) == STT_OBJECT) {
-                                    printf("%-20s %d\n", elf_strptr(elf, shdr.sh_link, sym32[i].st_name),
-                                           (((int*)data_data->d_buf)[sym32[i].st_value/sizeof (int)]));
-                                }
-                            } else {
-                                printf("%-20s %s\n", elf_strptr(elf, shdr.sh_link, sym32[i].st_name), "NULL");
-                            }
-                        }
-                    } else if (sym64) {
-                        if (sym64[i].st_shndx == SHN_UNDEF || sym64[i].st_shndx == SHN_COMMON ||
-                            sym64[i].st_shndx == SHN_ABS) {
-                            continue;
-                        }
-                        Elf_Scn *data_scn = elf_getscn(elf, sym64[i].st_shndx);
-                        if (data_scn != NULL) {
-                            Elf_Data *data_data = elf_getdata(data_scn, NULL);
-                            if (data_data != NULL) {
-                                if (GELF_ST_TYPE(sym64[i].st_info) == STT_OBJECT) {
-                                    printf("%-20s %d\n", elf_strptr(elf, shdr.sh_link, sym64[i].st_name),
-                                           (int)(((int*)data_data->d_buf)[sym64[i].st_value/sizeof (int)]));
-                                }
-                            } else {
-                                printf("%-20s %s\n", elf_strptr(elf, shdr.sh_link, sym64[i].st_name), "NULL");
-                            }
-                        }
-                    }
-                }
+                gelf_getsym(data, i, &sym);
+                
+                if (GELF_ST_TYPE(sym.st_info) != STT_OBJECT) continue;
+                
+                if (sym.st_shndx == SHN_UNDEF || sym.st_shndx == SHN_COMMON || sym.st_shndx == SHN_ABS) continue;
+
+                Elf_Scn *data_scn = elf_getscn(elf, sym.st_shndx);
+                if (!data_scn) continue;
+                
+                Elf_Data *data_data = elf_getdata(data_scn, NULL);
+                if (!data_data) continue;
+
+                printf("%-20s %d\n", elf_strptr(elf, shdr.sh_link, sym.st_name), (int)(((int*)data_data->d_buf)[sym.st_value/sizeof (int)]));
             }
         }
     }
