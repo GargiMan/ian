@@ -1,3 +1,5 @@
+# ELF files
+
 Cílem projektu je seznámit se se způsobem práce s ELF soubory.  
 Vašim úkolem je napsat program, který vypíše počáteční hodnoty globálních proměnných definovaných v programu. 
 
