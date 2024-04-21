@@ -3,7 +3,7 @@ char z = 5;
 int a = 10;
 static int b __attribute__((section(".my_data_section"))) = 42;
 char y;
-int x;
+extern int x;
 int main() {
     int c = a + b;
     printf("%d\n", c);
