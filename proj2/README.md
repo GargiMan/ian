@@ -1,4 +1,4 @@
-# Crash basics
+# Crash basics analysis
 
 Ku zadaniu máte priložený súbor ‘vmcore_p2’. Je to vmcore vytvorený ako dôsledok kernel panic verzie 4.18.0-348.12.2.el8_5 na architektúre x86_64.
 
